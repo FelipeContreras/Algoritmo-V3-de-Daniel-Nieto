@@ -1,0 +1,98 @@
+a) Los signos de puntuación son tratados como palabras.
+b) Un elemento "-RRB-" en TREE es equivalente a ")" en TEXT; un elemento 
+"-LRB-" en TREE es equivalente a "(" en TEXT. Ambos son tratados como palabras.
+c) En el algoritmo, cuando se hace referencia al TEXT de un SIMP/TYPE=parenthesis, entiéndase el contenido de SIMP/TEXT + ")". (iSimp sólo incluye el primer paréntesis de un elemento entre paréntesis en TEXT)
+d) En TREE, los elementos que siguen inmediatamente a un paréntesis izquierdo "(" son siempre un POS tag y no una palabra.
+e) En cada COMP, los números entre corchetes marcan las posiciones de una secuencia de caracteres en el TEXT de cada TYPE=sentence. A las palabras contenidas en estos caracteres denotados, me refiero como "contenidas en" COMP[]. Estos valores numéricos podrían ser sustituidos por la cadena denotada en sí.
+
+NOTA: La regla para simplificar TYPE=full relative clause, puede generar oraciones agramaticales en caso de que el relativo (WDT) lleve un caso no nominativo. Especificar la regla para que genere oraciones gramaticales en todos los casos implica mayor complejidad de la considerada para este algoritmo y requiere información no proveída por iSimp.
+NOTA 2: La regla para simplificar  TYPE=reduced relative clause puede mejorarse, pero se necesita establecer la noción de "núcleo" de una FN dentro de árboles sintácticos generados por el Standford parser.
+
+Algoritmo:
+
+        Para cada TYPE=sentence que contenga por lo menos un SIMP haz:
+            y=1, w=1
+            copia TREE y cada SIMP a SENTENCE.1 
+            ordena cada SIMP en SENTENCE.1 de forma que primero se encuentren aquellos SIMP para los cuales, el paréntesis izquierdo del par de paréntesis más exteriores que encierran solo a cada palabra de SENTENCE.1/SIMP/TEXT en SENTENCE.1/TREE, se encuentren más a la izquierda.
+            renombra/numera cada SIMP en SENTENCE.1 como SIMP.1, SIMP.2, etc. de acuerdo a su orden
+            renombra/numera cada COMP en cada SIMP en SENTENCE.1 como COMP.1, COMP.2, etc.
+            guarda SENTENCE.1 en MEMORIAB
+            numSIMP = al número de SIMP que hay en SENTENCE.1
+            mientras y<=numSIMP, haz:
+                busca SENTENCE.1/SIMP.y/TEXT en cada SENTENCE.x/TREE existente en MEMORIAB
+                si lo encuentras, haz: 
+                    copia SENTENCE.x en xTemp
+                    mueve SENTENCE.x a MEMORIAA
+                    aplica una de las siguientes reglas dependiendo el valor del SENTENCE.1/SIMP buscado y encontrado:
+                        si SENTENCE.1/SIMP.y/TYPE=verb or verb phrase coordination, entonces haz:
+                            cuenta el número de COMP=conjunct que hay en SENTENCE.1/SIMP.y y guarda el valor resultante en la variable i;
+                            crea un número i de cadenas vacías llamadas de TEMPORAL.1 a TEMPORAL.i
+                            p=i, q=1, r=1
+                            mientras p>0 haz:
+                                Si COMP.q=conjunct haz:
+                                    copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                    sustituye en TEMPORAL.r/TREE el contenido del par de paréntesis más exteriores que encierran solo a cada palabra de TEMPORAL.r/SIMP.y/TEXT, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                    p=p-1, r=r+1
+                                q=q+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+                        si SENTENCE.1/SIMP.y/TYPE=noun or noun phrase coordination, entonces haz:
+                            cuenta el número de COMP=conjunct que hay en SENTENCE.1/SIMP.y y guarda el valor resultante en la variable i
+                            crea un número i de cadenas vacías llamadas de TEMPORAL.1 a TEMPORAL.i
+                            p=i, q=1, r=1
+                            mientras p>0 haz:
+                                Si COMP.q=conjunct haz:
+                                    copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                    sustituye en TEMPORAL.r/TREE el contenido del par de paréntesis más exteriores que encierran solo a cada palabra de TEMPORAL.r/SIMP.y/TEXT, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                    p=p-1, r=r+1
+                                q=q+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+                        si SENTENCE.1/SIMP.y/TYPE=sentence coordination, entonces haz:
+                            cuenta el número de COMP=conjunct que hay en SENTENCE.1/SIMP.y y guarda el valor resultante en la variable i
+                            crea un número i de cadenas vacías llamadas de TEMPORAL.1 a TEMPORAL.i
+                            p=i, q=1, r=1
+                            mientras p>0 haz:
+                                Si COMP.q=conjunct haz:
+                                    copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                    sustituye todo el contenido de TEMPORAL.r/TREE, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                    p=p-1, r=r+1
+                                q=q+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+                        si SENTENCE.1/SIMP.y/TYPE=parentesis, entonces haz:
+                            crea 2 cadenas vacías llamadas  TEMPORAL.1 y TEMPORAL.2
+                            p=2, q=1, r=1
+                            mientras p>0 haz:
+                                copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                sustituye en TEMPORAL.r/TREE el contenido del par de paréntesis más exteriores que encierran solo a cada palabra de TEMPORAL.r/SIMP.y/TEXT, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                p=p-1, r=r+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+                        si SENTENCE.1/SIMP.y/TYPE=full relative clause, entonces haz:
+                            crea 2 cadenas vacías llamadas  TEMPORAL.1 y TEMPORAL.2
+                            p=2, q=1, r=1
+                            mientras p>0 haz:
+                                si SENTENCE.1/SIMP.y/COMP.q=referred noun frase, entonces haz:
+                                    copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                    sustituye en TEMPORAL.r/TREE el contenido del par de paréntesis más exteriores que encierran solo a cada palabra de TEMPORAL.r/SIMP.y/TEXT, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                si SENTENCE.1/SIMP.y/COMP.q=clause, entonces haz:
+                                    copia todo el contenido de SENTENCE.x en TEMPORAL.r, exepto por el contenido de TREE, éste déjalo vacío.
+                                    guarda en TEMPORAL..r/TREE, el contenido de par de paréntesis más exteriores que encierran sólo cada palabra de SENTENCE.1/SIMP.y/TEXT en SENTENCE.1/SIMP.Y/TREE.
+                                    si el POS tag de la primera palabra contenida en SENTENCE.1/SIMP.y/COMP[]=clause es igual a WDT cuando la buscas en TEMPORAL.1/TREE, elimina de TEMPORAL.r/TREE esta primera palabra, junto con su POS tag y el par de paréntesis que los encierra sólo a ellos. 
+                                p=p-1, r=r+1, q=q+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+                        si SENTENCE.1/SIMP.y/TYPE=reduced relative clause, entonces haz:
+                            crea 2 cadenas vacías llamadas  TEMPORAL.1 y TEMPORAL.2
+                            p=2, q=1, r=1
+                            mientras p>0 haz:
+                                si SENTENCE.1/SIMP.y/COMP.q=referred noun frase, entonces haz:
+                                    copia todo el contenido de xTemp en TEMPORAL.r (copia todo el contenido de SENTENCE.x en TEMPORAL.r)
+                                    sustituye en TEMPORAL.r/TREE el contenido del par de paréntesis más exteriores que encierran solo a cada palabra de TEMPORAL.r/SIMP.y/TEXT, por el contenido del par de paréntesis más exteriores que encierran solo a cada palabra contenida en SIMP.y/COMP.q[] en TEMPORAL.r/TREE
+                                si SENTENCE.1/SIMP.y/COMP.q=clause, entonces haz:
+                                    copia todo el contenido de SENTENCE.x en TEMPORAL.r, exepto por el contenido de TREE, éste déjalo vacío.
+                                    guarda en TEMPORAL..r/TREE, el contenido de par de paréntesis más exteriores que encierran sólo cada palabra de SENTENCE.1/SIMP.y/TEXT en SENTENCE.1/SIMP.Y/TREE.
+                                p=p-1, r=r+1, q=q+1
+                            guarda cada cadena TEMPORAL como una nueva SENTENCE.x en MEMORIAB
+
+
+                y=y+1
+            imprime cada SENTENCE.x/TREE existente en MEMORIA.B como texto (sin la estructura jerárquica y sin las estiquetas POS).
+        Si el TYPE=sentence no tenía ningún SIMP, imprime su TEXT.
+        fin
