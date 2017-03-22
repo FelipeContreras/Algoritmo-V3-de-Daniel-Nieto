@@ -1,8 +1,6 @@
 """
 Implementacion del Algoritmo de Daniel Nieto v4
 Programado por Jose Contreras
-
-
 """
 
 import copy
@@ -50,7 +48,6 @@ class Sentence(object):
   def agregarSIMP(self):
     self.SIMP.append(Simp())
 
-
  
 MEMORIAB=[]
 MEMORIAA=[]
@@ -61,9 +58,7 @@ arch=(sys.argv[1])
 f = open(arch)
 dato = f.read().splitlines()
 f.close
-
 frase=Frase() 
-
 for i in range(len(dato)):
   if 'TYPE: ' in dato[i][0:6]:
     frase.agregarTYPE(dato[i][6:])
@@ -85,7 +80,6 @@ for i in range(len(dato)):
 
 
 #-------Programa principal
-
 #Algoritmo v4
 
 
@@ -116,7 +110,6 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
           ordenSIMP.insert(j,ordenSIMP[k+1+j])
           Sentence1.SIMP.pop(k+2+j)
           ordenSIMP.pop(k+2+j)        
-
 #--cambio de orden de linea con respecto al algoritmo
   MEMORIAB.append(Sentence())
   MEMORIAB[0]=copy.deepcopy(Sentence1)
@@ -126,17 +119,9 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
   for j in Sentence1.SIMP:
     if 'noun or noun phrase coordination' in j.TYPE:
       numSimp2=numSimp2+1
-  print 'numSimp2=',numSimp2
-
-#  numSimp2=2
-
 #--
   while y<=numSimp:
-
-
     for k in range(numSimp2):
-
-
       for x in range(len(MEMORIAB)):
         if Sentence1.SIMP[y-1].TEXT in MEMORIAB[x].TEXT:
           MEMORIAA.append(Sentence())
@@ -217,7 +202,6 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
                 indice2= (int)(TEMPORAL[r-1].SIMP[y-1].COMP[q-1][TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('..')+2:TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find(']')])
                 cad2=Sentence1.TEXT[indice1:indice2]#----           
                 TEMPORAL[r-1].TEXT=TEMPORAL[r-1].TEXT.replace(cad1,cad2)
-
                 p=p-1
                 r=r+1
               q=q+1
@@ -256,29 +240,22 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
             while p>0:
               if 'referred noun phrase' in Sentence1.SIMP[y-1].COMP[q-1]:
                 TEMPORAL[r-1]=copy.deepcopy(xTemp)
-
                 if Sentence1.TEXT[Sentence1.TEXT.index(TEMPORAL[r-1].SIMP[y-1].TEXT)+len(TEMPORAL[r-1].SIMP[y-1].TEXT)-1]==',':
                   cad1=TEMPORAL[r-1].SIMP[y-1].TEXT+','
                 else:
                   cad1=TEMPORAL[r-1].SIMP[y-1].TEXT
-
                 indice1= (int)(TEMPORAL[r-1].SIMP[y-1].COMP[q-1][TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('[')+1:TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('..')])
                 indice2= (int)(TEMPORAL[r-1].SIMP[y-1].COMP[q-1][TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('..')+2:TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find(']')])
-
-
                 cad2=Sentence1.TEXT[indice1:indice2]
                 TEMPORAL[r-1].TEXT=TEMPORAL[r-1].TEXT.replace(cad1,cad2)
                 indice3=indice1
                 indice4=indice2
               if 'clause' in Sentence1.SIMP[y-1].COMP[q-1]:
                 TEMPORAL[r-1]=copy.deepcopy(xTemp)
-
                 indice1= (int)(TEMPORAL[r-1].SIMP[y-1].COMP[q-1][TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('[')+1:TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('..')])
                 indice2= (int)(TEMPORAL[r-1].SIMP[y-1].COMP[q-1][TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find('..')+2:TEMPORAL[r-1].SIMP[y-1].COMP[q-1].find(']')])
-
                 TEMPORAL[r-1].TEXT=copy.deepcopy(Sentence1.TEXT[indice3:indice4]+' '+Sentence1.TEXT[indice1:indice2])
                 cad3=Sentence1.TEXT[indice1:indice2]
-
                 cad4=cad3.split()
                 if (cad4[0]+'_WDT') in frase.POS:
                   TEMPORAL[r-1].TEXT=TEMPORAL[r-1].TEXT.replace(' '+cad4[0],'')
@@ -314,25 +291,18 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
             for i in range(len(TEMPORAL)):
               MEMORIAB.append(Sentence())
               MEMORIAB[-1]=copy.deepcopy(TEMPORAL[i])
-
-
-
-
-
     y=y+1
-
-
   for i in range(len(MEMORIAB)):
     if MEMORIAB[i].TEXT!='':
       print MEMORIAB[i].TEXT,"\n"#Salida
-#      archSalNombre=arch[:-4]+'_Salida'+'0'+(str)(i)+'.txt'
-#      archivoSalida=open(archSalNombre,"w")
-#      archivoSalida.write(MEMORIAB[i].TEXT)
-#      archivoSalida.close()
+      archSalNombre=arch[:-4]+'_Salida'+'0'+(str)(i)+'.txt'
+      archivoSalida=open(archSalNombre,"w")
+      archivoSalida.write(MEMORIAB[i].TEXT)
+      archivoSalida.close()
 else:
   print frase.TEXT #----Salida
-#  archSalNombre=arch[:-4]+'_Salida'+'.txt'
-#  archivoSalida=open(archSalNombre,"w")
-#  archivoSalida.write(frase.TEXT)
-#  archivoSalida.close()
+  archSalNombre=arch[:-4]+'_Salida'+'.txt'
+  archivoSalida=open(archSalNombre,"w")
+  archivoSalida.write(frase.TEXT)
+  archivoSalida.close()
 #FIN
