@@ -119,6 +119,8 @@ if ((frase.TYPE.find('sentence')) !=- 1) and (frase.SIMP!=[]) and (frase.SIMP[0]
   for j in Sentence1.SIMP:
     if 'noun or noun phrase coordination' in j.TYPE:
       numSimp2=numSimp2+1
+  if numSimp2==0:
+    numSimp2=1
 #--
   while y<=numSimp:
     for k in range(numSimp2):
